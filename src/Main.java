@@ -5,13 +5,14 @@ import java.util.concurrent.TimeUnit;
 public class Main {
     private static void work(int taskCount, Runnable task, ExecutorService executorService) throws Exception {
         long start = System.nanoTime();
-        long end = System.nanoTime();
 
         try (executorService) {
             for(int i = 0; i < taskCount; i++){
                 executorService.execute(task);
             }
         }
+
+        long end = System.nanoTime();
 
         executorService.shutdown();
         executorService.awaitTermination(1, TimeUnit.HOURS);
@@ -23,19 +24,16 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    long result = 0;
-                    for(int i = 1; i <= 1000; i++){
-                        result += i;
-                    }
-
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+        Runnable task = () -> {
+            try {
+                long result = 0;
+                for(int i = 1; i <= 1000; i++){
+                    result += i;
                 }
+
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         };
 
